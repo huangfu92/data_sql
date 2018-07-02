@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Database API</title>
+ <script src="./jquery-1.11.1.min.js"></script>
+ <style type="text/css">
+     #table{
+        width:100%;
+     }
+     #table td{
+        text-align: center;
+     }
+ </style>
+</head>
+<body>
+<table id="table" >
+    <thead>
+         <tr>
+            <th>id</th>
+            <th>姓名</th>
+            <th>年龄</th>
+            <th>mark</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+   <tbody>
+      
+   </tbody> 
+</table>
+    <input type="button" value="增加" id="Btn"> 
+    <script type="text/javascript">
+    //数据文件在谷歌浏览器下，默认存放的位置
+    //"C:/Users/Administrator/AppData/Local/Google/Chrome/User Data/Default/databases/1";
+        if(window.openDatabase){
+            //如果test数据库存在，则打开，否则会自动创建
+            var dataBase  =  openDatabase("test", "1.0", "Database test", 1024 * 1024);
+            //创建一个学生表
+            var sql = 'CREATE TABLE  if not exists "student" ('+
+                        '"id"  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,'+
+                        '"name"  TEXT NOT NULL,'+
+                        '"age"  TEXT,'+
+                        '"mark"  TEXT)';
+
+            //写入一条数据
+            //var sql2 = 'insert into student (name,age,mark) values ("frog",1,"nice frog") ';
+
+            //取出一行数据
+            var sql3 = 'select * from student';
+            
+
+            //预处理语句的用法
+            var sql4 = 'insert into student (name,age,mark) values (:name,:age,:mark)';
+
+            //删除数据
+            var sql5 = 'delete from student where id= ?';
+
+            //更新数据
+            var sql6 = 'update UserList set name = ? where id= ?'
+            //获取数据
+            function query_list () {
+                exec(sql,function(rs){
+                    exec(sql3,function(rs){
+                        //console.log(rs.rows[0])
+                        var table_html = ""
+                        for(var i = 0;i<rs.rows.length;i++){
+                            table_html += " <tr>"
+                            table_html += "<td>"+rs.rows[i].id+"</td>"
+                            table_html += "<td>"+rs.rows[i].name+"</td>"
+                            table_html += "<td>"+rs.rows[i].age+"</td>"
+                            table_html += "<td>"+rs.rows[i].mark+"</td>"
+                            table_html += "<td><span class='update' onclick='update("+rs.rows[i].id+","+rs.rows[i].name+","+rs.rows[i].age+","+rs.rows[i].mark+")'>修改</span><span class='del' onclick='del("+rs.rows[i].id+")'>删除</span></td>"
+                            table_html += "</tr>"    
+                        }
+                        $("#table tbody").html(table_html)
+                    })
+                })
+            }
+           
+            //更新数据
+            function update(id,name,age,mark) {
+                //name = "皇甫国贝"
+               var name = '王丽娜4';
+                var age  = 29;
+                var mark = '你好';
+                exec(sql,function(rs){
+                    exec2(sql6,[id,name,age,mark])
+                })
+            }
+             //删除数据
+            function del(id) {
+                exec(sql,function(rs){
+                    exec2(sql5,[id])
+                })
+            }
+          
+             $("#Btn").on("click",function(){
+                var name = '王丽娜4';
+                var age  = 29;
+                var mark = '你好';
+                exec(sql,function(rs){
+                    //这里之所以要用回调，
+                    //是因为数据操作过程是异步的
+                     exec2(sql4,[name,age,mark])
+                })
+            })
+             query_list()
+            //简单封装一个数据操作的方法
+            function exec(sql,callback){
+                dataBase.transaction(function(tx){
+                    //中间这个[]，在预处理语句中绑值
+                    tx.executeSql(sql,[],function(tx,rs){
+                        //success
+                        callback && callback(rs);
+                    },function(tx,msg){
+                        //error
+                        console.log(msg);
+                    });
+                });
+            }
+        function dropTable(User) {
+            dataBase.transaction(function (tx) {
+                tx.executeSql('drop table student');
+            });
+        }
+       // window.dropTable("student")
+           //支持变量邦定
+           function exec2(sql,para,callback){
+                para = para || [];
+                dataBase.transaction(function(tx){
+                    tx.executeSql(sql,para,function(tx,rs){
+                        //success
+                        callback && callback(rs);
+                    },function(tx,msg){
+                        //error
+                        console.log(msg);
+                    });
+                });
+           }
+
+        }
+
+    </script>
+
+</body>
+</html>

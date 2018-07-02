@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Database API</title>
+    <script src="./jquery-1.11.1.min.js"></script>
+</head>
+<body>
+    <input type="button" value="Btn" id="Btn"> 
+    <script type="text/javascript">
+    //数据文件在谷歌浏览器下，默认存放的位置
+    //"C:/Users/Administrator/AppData/Local/Google/Chrome/User Data/Default/databases/1";
+    /*
+    1、openDatabase：这个方法使用现有数据库或创建新数据库创建数据库对象。
+
+    2、transaction：这个方法允许我们根据情况控制事务提交或回滚。
+
+    3、executeSql：这个方法用于执行真实的SQL查询。
+    */
+        var dataBase = openDatabase("student", "1.0", "用户信息表", 1024 * 1024, function () { });
+        if (!dataBase) {
+            console.log("数据库创建失败！");
+        } else {
+            console.log("数据库创建成功！");
+        }
+        /*
+        executeSql函数有四个参数，其意义分别是：
+        1）表示查询的字符串，使用的SQL语言是SQLite 3.6.19。（必选）
+        2）插入到查询中问号所在处的字符串数据。（可选）
+        3）成功时执行的回调函数。返回两个参数：tx和执行的结果。（可选）
+        4）一个失败时执行的回调函数。返回两个参数：tx和失败的错误信息。（可选）
+        */
+
+        this.createTable=function() {
+            dataBase.transaction( function(tx) { 
+                tx.executeSql(
+                    'CREATE TABLE  if not exists "UserList" ('+
+                        '"id"  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,'+
+                        '"name"  TEXT NOT NULL,'+
+                        '"age"  TEXT,'+
+                        '"mark"  TEXT)',
+                    [], 
+                    function(tx,result){ console.log('创建stu表成功'); }, 
+                    function(tx, error){ console.log('创建stu表失败:' + error.message); 
+                });
+            });
+        }
+        window.createTable()
+        //增加
+        this.insert = function (name,age,mark) {
+            dataBase.transaction(function (tx) {
+                tx.executeSql(
+                    'insert into UserList (name,age,mark) values (:name,:age,:mark)',
+                    function () { console.log('添加数据成功'); },
+                    function (tx, error) { console.log('添加数据失败: ' + error.message); 
+                } );
+            });
+        }
+         // window.insert()
+        //查询
+        this.query = function () {
+            dataBase.transaction(function (tx) {
+                tx.executeSql(
+                "select * from UserList", [],
+                function (tx, result) { //执行成功的回调函数
+                //在这里对result 做你想要做的事情吧...........
+                },
+                function (tx, error) {
+                alert('查询失败: ' + error.message);
+                } );
+            });
+        }
+        /*
+            上面代码中执行成功的回调函数有一参数result。 
+
+                result：查询出来的数据集。其数据类型为 SQLResultSet ，就如同C#中的DataTable。 
+                SQLResultSet 的定义为：
+
+                 
+
+                interface SQLResultSet {
+                readonly attribute long insertId;
+                readonly attribute long rowsAffected;
+                readonly attribute SQLResultSetRowList rows;
+                };
+                 
+
+                其中最重要的属性—SQLResultSetRowList 类型的 rows 是数据集的“行” 。 
+                rows 有两个属性：length、item 。
+                故，获取查询结果的第一行列名为name的值 ：result.rows.item(0).name  。
+        */
+        //更新数据
+        this.update = function (id, name) {
+            dataBase.transaction(function (tx) {
+                tx.executeSql(
+                "update UserList set name = ? where id= ?",
+                [name, id],
+                function (tx, result) {
+                },
+                function (tx, error) {
+                    alert('更新失败: ' + error.message);
+                });
+            });
+        }
+        //删除
+        this.del = function (id) {
+            dataBase.transaction(function (tx) {
+                tx.executeSql(
+                    "delete from UserList where id= ?",
+                    [id],
+                    function (tx, result) {
+                    },
+                    function (tx, error) {
+                    alert('删除失败: ' + error.message);
+                    }
+                );
+            });
+        }
+        //删除数据表
+        this.dropTable = function () {
+            dataBase.transaction(function (tx) {
+                tx.executeSql('drop table student');
+            });
+        }
+        //window.dropTable("sqlite_sequence")
+        //预处理语句的用法
+        var sql4 = 'insert into UserList (name,age,mark) values (:name,:age,:mark)';
+        function exec(sql,callback){
+            db.transaction(function(tx){
+                //中间这个[]，在预处理语句中绑值
+                tx.executeSql(sql,[],function(tx,rs){
+                    //success
+                    callback && callback(rs);
+                },function(tx,msg){
+                    //error
+                    console.log(msg);
+                });
+            });
+        }
+        function exec2(sql,para,callback){
+            para = para || [];
+            db.transaction(function(tx){
+                tx.executeSql(sql,para,function(tx,rs){
+                    //success
+                    callback && callback(rs);
+                },function(tx,msg){
+                    //error
+                    console.log(msg);
+                });
+            });
+        }
+    </script>
+    <script>
+        $("#Btn").on("click",function(){
+            var name = '王丽娜3';
+            var age  = 29;
+            var mark = '你好';
+            window.insert(name,age,mark)
+            // exec(window.insert,function(rs){
+                
+            //      exec2(sql4,[name,age,mark])
+                 
+                
+            // });
+        })
+    </script>
+
+</body>
+</html>
