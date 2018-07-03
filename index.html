@@ -56,20 +56,24 @@
             var sql5 = 'delete from student where id= ?';
 
             //更新数据
-            var sql6 = 'update UserList set name = ? where id= ?'
+            var sql6 = 'updata student set id = ?where  name = ? , age= ?, mark= ?';
             //获取数据
+            //var data_Array = [];
             function query_list () {
                 exec(sql,function(rs){
                     exec(sql3,function(rs){
                         //console.log(rs.rows[0])
-                        var table_html = ""
+                        var table_html = "";
+                        
                         for(var i = 0;i<rs.rows.length;i++){
+                            var data_Array = [];
+                            data_Array.push(rs.rows[i].id,'"'+rs.rows[i].name+'"',parseInt(rs.rows[i].age),'"'+rs.rows[i].mark+'"')
                             table_html += " <tr>"
                             table_html += "<td>"+rs.rows[i].id+"</td>"
                             table_html += "<td>"+rs.rows[i].name+"</td>"
-                            table_html += "<td>"+rs.rows[i].age+"</td>"
+                            table_html += "<td>"+parseInt(rs.rows[i].age) +"</td>"
                             table_html += "<td>"+rs.rows[i].mark+"</td>"
-                            table_html += "<td><span class='update' onclick='update("+rs.rows[i].id+","+rs.rows[i].name+","+rs.rows[i].age+","+rs.rows[i].mark+")'>修改</span><span class='del' onclick='del("+rs.rows[i].id+")'>删除</span></td>"
+                            table_html += "<td><span class='update' onclick='update("+data_Array+")'>修改</span><span class='del' onclick='del("+rs.rows[i].id+")'>删除</span></td>"
                             table_html += "</tr>"    
                         }
                         $("#table tbody").html(table_html)
@@ -79,12 +83,12 @@
            
             //更新数据
             function update(id,name,age,mark) {
-                //name = "皇甫国贝"
-               var name = '王丽娜4';
-                var age  = 29;
-                var mark = '你好';
+               
+                 var data_Array = []
+                 data_Array.push(id,"皇甫国贝1111",209,"傻逼")
+               
                 exec(sql,function(rs){
-                    exec2(sql6,[id,name,age,mark])
+                    exec2(sql6,data_Array)
                 })
             }
              //删除数据
@@ -95,13 +99,13 @@
             }
           
              $("#Btn").on("click",function(){
-                var name = '王丽娜4';
-                var age  = 29;
-                var mark = '你好';
+                
+                var data = [];
+                data.push("皇甫国贝",parseInt(7/2),"你好么么么么么")
                 exec(sql,function(rs){
                     //这里之所以要用回调，
                     //是因为数据操作过程是异步的
-                     exec2(sql4,[name,age,mark])
+                     exec2(sql4,data)
                 })
             })
              query_list()
