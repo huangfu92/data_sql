@@ -38,7 +38,7 @@
             //创建一个学生表
             var sql = 'CREATE TABLE  if not exists "student" ('+
                         '"id"  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,'+
-                        '"name"  TEXT NOT NULL,'+
+                        '"name"  TEXT ,'+
                         '"age"  TEXT,'+
                         '"mark"  TEXT)';
 
@@ -56,7 +56,7 @@
             var sql5 = 'delete from student where id= ?';
 
             //更新数据
-            var sql6 = 'updata student set id = ?where  name = ? , age= ?, mark= ?';
+            var sql6 = 'update student set name = ? ,  age= ? , mark= ? where  id = ?';
             //获取数据
             //var data_Array = [];
             function query_list () {
@@ -73,7 +73,7 @@
                             table_html += "<td>"+rs.rows[i].name+"</td>"
                             table_html += "<td>"+parseInt(rs.rows[i].age) +"</td>"
                             table_html += "<td>"+rs.rows[i].mark+"</td>"
-                            table_html += "<td><span class='update' onclick='update("+data_Array+")'>修改</span><span class='del' onclick='del("+rs.rows[i].id+")'>删除</span></td>"
+                            table_html += "<td><span class='update' onclick='update("+rs.rows[i].id+")'>修改</span><span class='del' onclick='del("+rs.rows[i].id+")'>删除</span></td>"
                             table_html += "</tr>"    
                         }
                         $("#table tbody").html(table_html)
@@ -82,11 +82,11 @@
             }
            
             //更新数据
-            function update(id,name,age,mark) {
+            function update(id) {
                
                  var data_Array = []
-                 data_Array.push(id,"皇甫国贝1111",209,"傻逼")
-               
+                 data_Array.push("皇甫国贝1111",209,"nininini",id)
+               // console.log(data_Array)
                 exec(sql,function(rs){
                     exec2(sql6,data_Array)
                 })
@@ -101,7 +101,7 @@
              $("#Btn").on("click",function(){
                 
                 var data = [];
-                data.push("皇甫国贝",parseInt(7/2),"你好么么么么么")
+                data.push("皇甫国贝",parseInt(7/2),"你好么")
                 exec(sql,function(rs){
                     //这里之所以要用回调，
                     //是因为数据操作过程是异步的
@@ -134,6 +134,7 @@
                 dataBase.transaction(function(tx){
                     tx.executeSql(sql,para,function(tx,rs){
                         //success
+                        
                         callback && callback(rs);
                     },function(tx,msg){
                         //error
