@@ -1,53 +1,56 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Database API</title>
- <script src="./jquery-1.11.1.min.js"></script>
- <style type="text/css">
-     #table{
-        width:100%;
-     }
-     #table td{
-        text-align: center;
-     }
- </style>
+    <script src="./jquery-1.11.1.min.js"></script>
+    <style type="text/css">
+        #table {
+            width: 100%;
+        }
+
+        #table td {
+            text-align: center;
+        }
+    </style>
 </head>
+
 <body>
-<table id="table" >
-    <thead>
-         <tr>
-            <th>id</th>
-            <th>姓名</th>
-            <th>年龄</th>
-            <th>mark</th>
-            <th>操作</th>
-        </tr>
-    </thead>
-   <tbody>
-      
-   </tbody> 
-</table>
-    <input type="button" value="增加" id="Btn"> 
+    <table id="table">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>姓名</th>
+                <th>年龄</th>
+                <th>mark</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+    <input type="button" value="增加" id="Btn">
     <script type="text/javascript">
-    //数据文件在谷歌浏览器下，默认存放的位置
-    //"C:/Users/Administrator/AppData/Local/Google/Chrome/User Data/Default/databases/1";
-        if(window.openDatabase){
+        //数据文件在谷歌浏览器下，默认存放的位置
+        //"C:/Users/Administrator/AppData/Local/Google/Chrome/User Data/Default/databases/1";
+        if (window.openDatabase) {
             //如果test数据库存在，则打开，否则会自动创建
-            var dataBase  =  openDatabase("test", "1.0", "Database test", 1024 * 1024);
+            var dataBase = openDatabase("test", "1.0", "Database test", 1024 * 1024);
             //创建一个学生表
-            var sql = 'CREATE TABLE  if not exists "student" ('+
-                        '"id"  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,'+
-                        '"name"  TEXT ,'+
-                        '"age"  TEXT,'+
-                        '"mark"  TEXT)';
+            var sql = 'CREATE TABLE  if not exists "student" (' +
+                '"id"  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,' +
+                '"name"  TEXT ,' +
+                '"age"  TEXT,' +
+                '"mark"  TEXT)';
 
             //写入一条数据
             //var sql2 = 'insert into student (name,age,mark) values ("frog",1,"nice frog") ';
 
             //取出一行数据
             var sql3 = 'select * from student';
-            
+
 
             //预处理语句的用法
             var sql4 = 'insert into student (name,age,mark) values (:name,:age,:mark)';
@@ -59,93 +62,94 @@
             var sql6 = 'update student set name = ? ,  age= ? , mark= ? where  id = ?';
             //获取数据
             //var data_Array = [];
-            function query_list () {
-                exec(sql,function(rs){
-                    exec(sql3,function(rs){
+            function query_list() {
+                exec(sql, function (rs) {
+                    exec(sql3, function (rs) {
                         //console.log(rs.rows[0])
                         var table_html = "";
-                        
-                        for(var i = 0;i<rs.rows.length;i++){
+
+                        for (var i = 0; i < rs.rows.length; i++) {
                             var data_Array = [];
-                            data_Array.push(rs.rows[i].id,'"'+rs.rows[i].name+'"',parseInt(rs.rows[i].age),'"'+rs.rows[i].mark+'"')
+                            data_Array.push(rs.rows[i].id, '"' + rs.rows[i].name + '"', parseInt(rs.rows[i].age), '"' + rs.rows[i].mark + '"')
                             table_html += " <tr>"
-                            table_html += "<td>"+rs.rows[i].id+"</td>"
-                            table_html += "<td>"+rs.rows[i].name+"</td>"
-                            table_html += "<td>"+parseInt(rs.rows[i].age) +"</td>"
-                            table_html += "<td>"+rs.rows[i].mark+"</td>"
-                            table_html += "<td><span class='update' onclick='update("+rs.rows[i].id+")'>修改</span><span class='del' onclick='del("+rs.rows[i].id+")'>删除</span></td>"
-                            table_html += "</tr>"    
+                            table_html += "<td>" + rs.rows[i].id + "</td>"
+                            table_html += "<td>" + rs.rows[i].name + "</td>"
+                            table_html += "<td>" + parseInt(rs.rows[i].age) + "</td>"
+                            table_html += "<td>" + rs.rows[i].mark + "</td>"
+                            table_html += "<td><span class='update' onclick='update(" + rs.rows[i].id + ")'>修改</span><span class='del' onclick='del(" + rs.rows[i].id + ")'>删除</span></td>"
+                            table_html += "</tr>"
                         }
                         $("#table tbody").html(table_html)
                     })
                 })
             }
-           
+
             //更新数据
             function update(id) {
-               
-                 var data_Array = []
-                 data_Array.push("皇甫国贝1111",209,"nininini",id)
-               // console.log(data_Array)
-                exec(sql,function(rs){
-                    exec2(sql6,data_Array)
+
+                var data_Array = []
+                data_Array.push("皇甫国贝1111", 209, "nininini", id)
+                // console.log(data_Array)
+                exec(sql, function (rs) {
+                    exec2(sql6, data_Array)
                 })
             }
-             //删除数据
+            //删除数据
             function del(id) {
-                exec(sql,function(rs){
-                    exec2(sql5,[id])
+                exec(sql, function (rs) {
+                    exec2(sql5, [id])
                 })
             }
-          
-             $("#Btn").on("click",function(){
-                       
+
+            $("#Btn").on("click", function () {
+
                 var data = [];
-                data.push("皇甫国贝",parseInt(7/2),"你好么")
-                exec(sql,function(rs){
+                data.push("皇甫国贝", parseInt(7 / 2), "你好么")
+                exec(sql, function (rs) {
                     //这里之所以要用回调，
                     //是因为数据操作过程是异步的
-                     exec2(sql4,data)
+                    exec2(sql4, data)
                 })
             })
-             query_list()
+            query_list()
             //简单封装一个数据操作的方法
-            function exec(sql,callback){
-                dataBase.transaction(function(tx){
+            function exec(sql, callback) {
+                dataBase.transaction(function (tx) {
                     //中间这个[]，在预处理语句中绑值
-                    tx.executeSql(sql,[],function(tx,rs){
+                    tx.executeSql(sql, [], function (tx, rs) {
                         //success
                         callback && callback(rs);
-                    },function(tx,msg){
+                    }, function (tx, msg) {
                         //error
                         console.log(msg);
                     });
                 });
             }
-        function dropTable(User) {
-            dataBase.transaction(function (tx) {
-                tx.executeSql('drop table student');
-            });
-        }
-       // window.dropTable("student")
-           //支持变量邦定
-           function exec2(sql,para,callback){
+            function dropTable(User) {
+                dataBase.transaction(function (tx) {
+                    tx.executeSql('drop table student');
+                });
+            }
+            // window.dropTable("student")
+            //支持变量邦定
+            function exec2(sql, para, callback) {
                 para = para || [];
-                dataBase.transaction(function(tx){
-                    tx.executeSql(sql,para,function(tx,rs){
+                dataBase.transaction(function (tx) {
+                    tx.executeSql(sql, para, function (tx, rs) {
                         //success
-                        
+
                         callback && callback(rs);
-                    },function(tx,msg){
+                    }, function (tx, msg) {
                         //error
                         console.log(msg);
                     });
                 });
-           }
+            }
 
         }
 
     </script>
 
 </body>
+
 </html>
